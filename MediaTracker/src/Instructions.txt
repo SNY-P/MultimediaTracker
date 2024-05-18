@@ -1,0 +1,3 @@
+in src, run: javac App.java
+then go back: cd ..
+then run: java -cp "src;lib/*" App
