@@ -5,10 +5,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class dbConnection {
-    // public static final String url = "jdbc:sqlite:D:/Main/Projects/cmdMediaTracker/MediaTracker/src/mediaTracker.db";
 
     public static Connection connect() throws SQLException {
-        String url = "jdbc:sqlite:D:/Main/Projects/cmdMediaTracker/MediaTracker/src/mediaTracker.db";
+        String url = "jdbc:sqlite:mediaTracker.db";
         Connection conn = null;
         try {
             conn = DriverManager.getConnection(url);
@@ -59,26 +58,6 @@ public class dbConnection {
         }
 
         return usernameExists;
-    }
-
-    public boolean checkPassword(String password) {
-        boolean passwordExists = false;
-
-        String query = "SELECT * FROM UserInfo WHERE Password = ?";
-
-        try (Connection conn = connect();
-            PreparedStatement pstmt = conn.prepareStatement(query)) {
-            pstmt.setString(1, password);
-            try (ResultSet rs = pstmt.executeQuery()) {
-                if (rs.next()) {
-                    passwordExists = true;
-                }
-            }
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
-        
-        return passwordExists;
     }
 
     public boolean checkDetails(String username, String password) {
