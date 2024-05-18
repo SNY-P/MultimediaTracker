@@ -148,10 +148,24 @@ public class App {
             String status = scanner.nextLine();
             System.out.print("Reading Format: ");
             String format = scanner.nextLine();
+
+            if (format.equalsIgnoreCase("Online")) {
+                System.out.print("Online Source: ");
+                String source = scanner.nextLine();
+            }
+
+            System.out.print("Translated? Y/N: ");
+            String translated = scanner.nextLine();
+
+            if (translated.equalsIgnoreCase("Y") || translated.equalsIgnoreCase("Yes")) {
+                System.out.print("Country of Origin: ");
+                String country = scanner.nextLine();
+            }
+
             System.out.print("Chapters Read: ");
             int chapters = scanner.nextInt();
             scanner.nextLine();
-
+            
             if (name.isEmpty() || status.isEmpty() || format.isEmpty()) {
                 System.out.println("One or more entries is missing. Try Again");
             } else {
