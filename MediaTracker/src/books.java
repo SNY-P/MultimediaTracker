@@ -7,7 +7,10 @@ public class books {
     dbConnection dbc = new dbConnection();
     // view the table
     public void booksSelect(int uID) throws SQLException {
-        String query = "SELECT booksID, Name, Status, Format, Chapters FROM Books WHERE userID = ?";
+        String query = "SELECT b.booksID, b.Name, b.Status, b.Format, b.Chapters, c.Name as Country " +
+                       "FROM Books b " + 
+                       "LEFT JOIN Country c ON b.Country = c.countryID " +
+                       "WHERE userID = ?";
         
         try (Connection conn = dbConnection.connect();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
@@ -15,8 +18,8 @@ public class books {
             pstmt.setInt(1, uID);
             try (ResultSet rst = pstmt.executeQuery()) {
                 int[] lengths = bEntryLength(uID, conn);
-                System.out.printf("%-" + lengths[0] + "s%-" + lengths[1] + "s%-" + lengths[2] + "s%-" + lengths[3] + "s%-" + lengths[4] + "s\n",
-                                  "Books ID", "Name", "Status", "Format", "Chapters Read");
+                System.out.printf("%-" + lengths[0] + "s%-" + lengths[1] + "s%-" + lengths[2] + "s%-" + lengths[3] + "s%-" + lengths[4] + "s%-" + lengths[5] + "s\n",
+                                  "Books ID", "Name", "Status", "Format", "Chapters Read", "Country");
 
                 while (rst.next()) {
                     int id = rst.getInt("booksID");
@@ -24,8 +27,9 @@ public class books {
                     String status = rst.getString("Status");
                     String format = rst.getString("Format");
                     int chaptersRead = rst.getInt("Chapters");
-                    System.out.printf("%-" + lengths[0] + "d%-" + lengths[1] + "s%-" + lengths[2] + "s%-" + lengths[3] + "s%-" + lengths[4] + "d\n",
-                                      id, name, status, format, chaptersRead);
+                    String country = rst.getString("Country");
+                    System.out.printf("%-" + lengths[0] + "d%-" + lengths[1] + "s%-" + lengths[2] + "s%-" + lengths[3] + "s%-" + lengths[4] + "d%-" + lengths[5] + "s\n",
+                                      id, name, status, format, chaptersRead, country);
                 }
             }
         } catch (SQLException e) {
@@ -34,8 +38,12 @@ public class books {
     }
     // used to evenly space out the table
     private int[] bEntryLength(int uID, Connection conn) throws SQLException {
-        String query = "SELECT booksID, Name, Status, Format, Chapters FROM Books WHERE userID = ?";
-        int[] columnLengths = new int[5];
+        String query = "SELECT b.booksID, b.Name, b.Status, b.Format, b.Chapters, c.Name as Country " +
+                       "FROM Books b " + 
+                       "LEFT JOIN Country c ON b.Country = c.countryID " +
+                       "WHERE userID = ?";
+
+        int[] columnLengths = new int[6];
 
         try (PreparedStatement pstmt = conn.prepareStatement(query)) {
             pstmt.setInt(1, uID);
@@ -45,6 +53,7 @@ public class books {
                 int maxStatusLength = 0;
                 int maxFormatLength = 0;
                 int maxChaptersReadLength = 0;
+                int maxCountryLength = 0;
 
                 while (rst.next()) {
                     maxBooksIdLength = Math.max(maxBooksIdLength, String.valueOf(rst.getInt("booksID")).length());
@@ -52,6 +61,7 @@ public class books {
                     maxStatusLength = Math.max(maxStatusLength, rst.getString("Status").length());
                     maxFormatLength = Math.max(maxFormatLength, rst.getString("Format").length());
                     maxChaptersReadLength = Math.max(maxChaptersReadLength, String.valueOf(rst.getInt("Chapters")).length());
+                    maxCountryLength = Math.max(maxCountryLength, String.valueOf(rst.getInt("Country")).length());
                 }
 
                 columnLengths[0] = maxBooksIdLength + 10;
@@ -59,6 +69,7 @@ public class books {
                 columnLengths[2] = maxStatusLength + 10;
                 columnLengths[3] = maxFormatLength + 10;
                 columnLengths[4] = maxChaptersReadLength + 10;
+                columnLengths[5] = maxCountryLength + 10;
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -146,5 +157,25 @@ public class books {
             System.err.println(e.getMessage());
             return entryExists;
         }        
+    }
+
+    public int selectCountryId(String name) {
+        int cID = 0;
+
+        String query = "SELECT countryID FROM Country WHERE Name = ?";
+
+        try (Connection conn = dbConnection.connect();
+                PreparedStatement pstmt = conn.prepareStatement(query);) {
+            pstmt.setString(1, name);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    cID = rs.getInt("countryID");
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println(e.getMessage());
+        }
+
+        return cID;
     }
 }

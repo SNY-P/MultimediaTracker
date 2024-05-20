@@ -160,6 +160,11 @@ public class App {
             if (translated.equalsIgnoreCase("Y") || translated.equalsIgnoreCase("Yes")) {
                 System.out.print("Country of Origin: ");
                 String country = scanner.nextLine();
+                if (bks.selectCountryId(country) == 0) {
+                    System.out.println("Country is not in the database");
+                }
+
+                int cID = bks.selectCountryId(capitalizeWords(country));
             }
 
             System.out.print("Chapters Read: ");
@@ -168,7 +173,8 @@ public class App {
             
             if (name.isEmpty() || status.isEmpty() || format.isEmpty()) {
                 System.out.println("One or more entries is missing. Try Again");
-            } else {
+            } 
+            else {
                 bks.bookAdd(name, status, format, chapters, uID);
                 System.out.println("Book Added\n");
                 bks.booksSelect(uID);
@@ -252,4 +258,24 @@ public class App {
             booksNavigation(uID);
         }
     }
+
+    private static String capitalizeWords(String str) {
+        if (str == null || str.isEmpty()) {
+            return str;
+        }
+
+        String[] words = str.split("\\s+");
+        StringBuilder capitalized = new StringBuilder();
+
+        for (String word : words) {
+            if (word.length() > 0) {
+                capitalized.append(Character.toUpperCase(word.charAt(0)))
+                           .append(word.substring(1).toLowerCase())
+                           .append(" ");
+            }
+        }
+
+        return capitalized.toString().trim();
+    }
+
 }

@@ -1,0 +1,8 @@
+{
+    "java.project.referencedLibraries": [
+        "lib/**/*.jar",
+        "d:\\Main\\Projects\\cmdMediaTracker\\MediaTracker\\src\\slf4j-api-1.7.36.jar",
+        "d:\\Main\\Projects\\cmdMediaTracker\\MediaTracker\\src\\sqlite-jdbc-3.45.3.0.jar",
+        "d:\\Program Files\\Java\\commons-lang3-3.14.0\\commons-lang3-3.14.0.jar"
+    ]
+}
