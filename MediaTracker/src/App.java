@@ -109,7 +109,7 @@ public class App {
             }
         }
     }
-    
+    // fix issue after coming back here
     public static void booksNavigation(int uID) throws SQLException {
         while (true) {
             System.out.println("Books & Novels");

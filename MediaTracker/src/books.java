@@ -21,7 +21,7 @@ public class books {
                 // To Select: id, name, status, format, country, source, chapters
     
                 String query = "SELECT b.booksID, b.Name, b.Status, b.Format, b.Source, b.Chapters, c.Name as Country " + 
-                               "FROM Books b LEFT JOIN Country c ON b.countryID = c.countryID WHERE userID = ?";
+                               "FROM Books b LEFT JOIN Country c ON b.countryID = c.countryID WHERE b.userID = ?";
     
                 try (Connection conn = dbConnection.connect();
                      PreparedStatement ps = conn.prepareStatement(query)) {
@@ -37,10 +37,10 @@ public class books {
                             String name = rs.getString("Name");
                             String status = rs.getString("Status");
                             String format = rs.getString("Format");
-                            int chaptersRead = rs.getInt("Chapters");
                             String country = rs.getString("Country");
                             String source = rs.getString("Source");
-                            System.out.printf("%-" + lengths[0] + "s%-" + lengths[1] + "s%-" + lengths[2] + "s%-" + lengths[3] + "s%-" + lengths[7] + "s%-" + lengths[5] + "s\n",
+                            int chaptersRead = rs.getInt("Chapters");
+                            System.out.printf("%-" + lengths[0] + "d%-" + lengths[1] + "s%-" + lengths[2] + "s%-" + lengths[3] + "s%-" + lengths[7] + "s%-" + lengths[5] + "s%-" + lengths[6] + "d\n",
                                               id, name, status, format, country, source, chaptersRead);
                         }
                     } 
@@ -48,14 +48,14 @@ public class books {
                 catch (SQLException e) {
                     System.out.println(e.getMessage());
                 }
-                scanner.close();
-                return;
             }
             else {
                 // select db for translated novels
                 // To Select: id, name, status, format, country, originalname, source, chapters
                 String query = "SELECT b.booksID, b.Name, b.Status, b.Format, b.OriginalName, b.Source, b.Chapters, c.Name as Country " + 
-                               "FROM Books b LEFT JOIN Country c ON b.countryID = c.countryID WHERE userID = ?";
+                               "FROM Books b " + 
+                               "LEFT JOIN Country c ON b.countryID = c.countryID "+ 
+                               "WHERE b.userID = ?";
     
                 try (Connection conn = dbConnection.connect();
                 PreparedStatement ps = conn.prepareStatement(query)) {
@@ -63,7 +63,7 @@ public class books {
     
                     try (ResultSet rs = ps.executeQuery()) {
                         int[] lengths = bEntryLength(uID, conn);
-                        System.out.printf("%-" + lengths[0] + "s%-" + lengths[1] + "s%-" + lengths[2] + "s%-" + lengths[3] + "s%-" + lengths[7] + "s%-" + lengths[4] + "s%-" + lengths[5] + "s\n",
+                        System.out.printf("%-" + lengths[0] + "s%-" + lengths[1] + "s%-" + lengths[2] + "s%-" + lengths[3] + "s%-" + lengths[7] + "s%-" + lengths[4] + "s%-" + lengths[5] + "s%-" + lengths[6] + "s\n",
                                   "Books ID", "Name", "Status", "Format", "Country", "COO Name", "Source", "Chapters Read");
     
                         while (rs.next()) {
@@ -71,11 +71,11 @@ public class books {
                             String name = rs.getString("Name");
                             String status = rs.getString("Status");
                             String format = rs.getString("Format");
-                            String cooName = rs.getString("OriginalName");
-                            int chaptersRead = rs.getInt("Chapters");
                             String country = rs.getString("Country");
+                            String cooName = rs.getString("OriginalName");
                             String source = rs.getString("Source");
-                            System.out.printf("%-" + lengths[0] + "s%-" + lengths[1] + "s%-" + lengths[2] + "s%-" + lengths[3] + "s%-" + lengths[7] + "s%-" +  lengths[4] + "s%-" + lengths[5] + "s\n",
+                            int chaptersRead = rs.getInt("Chapters");
+                            System.out.printf("%-" + lengths[0] + "d%-" + lengths[1] + "s%-" + lengths[2] + "s%-" + lengths[3] + "s%-" + lengths[7] + "s%-" +  lengths[4] + "s%-" + lengths[5] + "s%-" + lengths[6] + "d\n",
                                               id, name, status, format, country, cooName, source, chaptersRead);
                         }
                     } 
@@ -83,9 +83,9 @@ public class books {
                 catch (SQLException e) {
                     System.out.println(e.getMessage());
                 }
-                scanner.close();
-                return;
             }
+            scanner.close();
+            return;
         }
     }
     // used to evenly space out the table
@@ -93,7 +93,7 @@ public class books {
         String query = "SELECT b.booksID, b.Name, b.Status, b.Format, b.OriginalName, b.Source, b.Chapters, c.Name as Country " +
                        "FROM Books b " + 
                        "LEFT JOIN Country c ON b.countryID = c.countryID " +
-                       "WHERE userID = ?";
+                       "WHERE b.userID = ?";
 
         int[] columnLengths = new int[8];
 
@@ -114,10 +114,23 @@ public class books {
                     maxNameLength = Math.max(maxNameLength, rst.getString("Name").length());
                     maxStatusLength = Math.max(maxStatusLength, rst.getString("Status").length());
                     maxFormatLength = Math.max(maxFormatLength, rst.getString("Format").length());
-                    maxOriginalNameLength = Math.max(maxOriginalNameLength, rst.getString("OriginalName").length());
-                    maxSourceLength = Math.max(maxSourceLength, rst.getString("Source").length());
+                    if (rst.getString("OriginalName") == null) {
+                        maxOriginalNameLength = 0;
+                    } else {
+                        maxOriginalNameLength = Math.max(maxOriginalNameLength, rst.getString("OriginalName").length());
+                    }
+
+                    if (rst.getString("Source") == null) {
+                        maxSourceLength = 0;
+                    } else {
+                        maxSourceLength = Math.max(maxSourceLength, rst.getString("Source").length());
+                    }
                     maxChaptersReadLength = Math.max(maxChaptersReadLength, String.valueOf(rst.getInt("Chapters")).length());
-                    maxCountryLength = Math.max(maxCountryLength, String.valueOf(rst.getInt("Country")).length());
+                    if (rst.getString("country") == null) {
+                        maxCountryLength = 0;
+                    } else {
+                        maxCountryLength = Math.max(maxCountryLength, rst.getString("Country").length());
+                    }
                 }
 
                 columnLengths[0] = maxBooksIdLength + 10;

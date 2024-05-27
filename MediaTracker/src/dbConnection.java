@@ -7,7 +7,8 @@ import java.sql.SQLException;
 public class dbConnection {
 
     public static Connection connect() throws SQLException {
-        String url = "jdbc:sqlite:mediaTracker.db";
+        // String url = "jdbc:sqlite:mediaTracker.db";
+        String url = "jdbc:sqlite:MediaTracker/src/mediaTracker.db";
         Connection conn = null;
         try {
             conn = DriverManager.getConnection(url);
